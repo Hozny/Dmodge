@@ -33,9 +33,18 @@ class DmojClient():
         resp_data = resp.json()["data"]["objects"]
         
         return resp_data
-    
 
+    async def get_problem(self, id):
+        url_endpoint = f"https://dmoj.ca/api/v2/problem/{id}"
+        resp = requests.get(url_endpoint)
+        resp_data = resp.json()["data"]["object"]
+        
+        return resp_data
 
+    async def is_user_exist(self, user_id):
+        url_endpoint = f"https://dmoj.ca/api/v2/user/{user_id}"
+        resp = requests.get(url_endpoint)
+        resp_data = resp.json()
 
-
+        return False if "error" in resp_data else True
 
