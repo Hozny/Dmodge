@@ -4,8 +4,6 @@ class DmojClient():
     async def get_user_submission(self, user, problem_id = None):
         url_endpoint = "https://dmoj.ca/api/v2/submissions"
         params = {"user": user, "problem": problem_id}
-        if problem_id is not None:
-            params["problem"] = problem_id
 
         resp = requests.get(url_endpoint, params=params)
         resp_data = resp.json()["data"]["objects"]
