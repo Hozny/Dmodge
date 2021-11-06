@@ -3,12 +3,18 @@ from discord.ext import commands
 import os
 
 from dmodge import Dmodge
-
-DISCORD_CLIENT_SECRET = os.getenv('DISCORD_CLIENT_SECRET')
-client = commands.Bot(command_prefix="!", intents=discord.Intents.all())
+from dmoj_client import DmojClient
+from contest_manager import ContestManager
 
 def setup(client):
-    client.add_cog(Dmodge(client))
+    dmoj_client = DmojClient()
 
-setup(client)
-client.run(DISCORD_CLIENT_SECRET)
+    client.add_cog(Dmodge(client, dmoj_client))
+    client.add_cog(ContestManager(client, dmoj_client))
+
+if __name__ == "__main__":
+    DISCORD_CLIENT_SECRET = os.getenv('DISCORD_CLIENT_SECRET')
+    client = commands.Bot(command_prefix="!", intents=discord.Intents.all())
+
+    setup(client)
+    client.run(DISCORD_CLIENT_SECRET)

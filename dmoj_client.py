@@ -1,7 +1,7 @@
 import requests
 
 class DmojClient():
-    async def get_user_submission(self, user, problem_id = None):
+    async def get_user_submission_raw(self, user, problem_id = None):
         url_endpoint = "https://dmoj.ca/api/v2/submissions"
         params = {"user": user, "problem": problem_id}
 
@@ -35,7 +35,10 @@ class DmojClient():
     async def get_problem(self, id):
         url_endpoint = f"https://dmoj.ca/api/v2/problem/{id}"
         resp = requests.get(url_endpoint)
-        resp_data = resp.json()["data"]["object"]
+        try:
+            resp_data = resp.json()["data"]["object"]
+        except KeyError:
+            return None
         
         return resp_data
 
@@ -46,3 +49,28 @@ class DmojClient():
 
         return False if "error" in resp_data else True
 
+    async def get_user_submissions(self, user_id, problem_id):
+        """
+        :returns: (bool, int) bool for if problem was solved 
+                  int for number of non-AC submissions before first AC
+                  None if failed query
+        """
+        if not await self.is_user_exist(user_id):
+            return None, None
+
+        url_endpoint = f"https://dmoj.ca/api/v2/submissions"
+        params = {"user": user_id, "problem": problem_id}
+        resp = requests.get(url_endpoint, params)
+        try:
+            resp_data = resp.json()["data"]["objects"]
+        except KeyError:
+            return None, None
+
+        wrong = 0
+        accepted = False
+        for submission in resp_data:
+            if submission["result"] == "AC":
+                accepted = True
+                break
+            wrong += 1
+        return accepted, wrong
