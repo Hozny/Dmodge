@@ -47,7 +47,7 @@ class DmojClient():
         resp = requests.get(url_endpoint)
         resp_data = resp.json()
 
-        return False if "error" in resp_data else True
+        return False if "error" in resp_data else True;
 
     async def get_user_submissions(self, user_id, problem_id):
         """
@@ -65,7 +65,10 @@ class DmojClient():
             resp_data = resp.json()["data"]["objects"]
         except KeyError:
             return None, None
-
+        '''
+        if len(resp_data) == 0:
+            return None, None
+        '''
         wrong = 0
         accepted = False
         for submission in resp_data:
