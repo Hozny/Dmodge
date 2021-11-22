@@ -1,4 +1,6 @@
+import discord
 from discord.ext import commands
+from discord.mentions import AllowedMentions
 
 from micro_db import MicroDB
 
@@ -33,7 +35,7 @@ class Dmodge(commands.Cog):
     @commands.command()
     async def link_dmoj_account(self, ctx, user_id):
         if not await self._dmoj_client.is_user_exist(user_id):
-            await ctx.send(f"Could not find DMOJ user matching name: {user_id}")
+            await ctx.send(f"Could not find DMOJ user with name **{user_id}**")
             return
 
         author = ctx.author.display_name
@@ -43,11 +45,14 @@ class Dmodge(commands.Cog):
             await ctx.send(f"You're already linked to this account")
             return
         if user_id in user_data.values():
-            await ctx.send(f"Account already linked to someone; ask them to unlink or ask for help")
+            key = [k for k, v in user_data.items() if v == user_id] 
+            taken = await self.client.fetch_user(key[0])
+            await ctx.send(f"**{user_id}** is already linked to {taken.mention}", \
+                allowed_mentions=discord.AllowedMentions.none())
             return
 
         self._users_db.set(authorID, user_id)
-        await ctx.send(f"Succesfully linked {user_id} to {author}.")
+        await ctx.send(f"Succesfully linked **{user_id}** to {ctx.author.mention}.")
 
 
     @commands.command()
